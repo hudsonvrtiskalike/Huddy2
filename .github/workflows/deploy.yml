@@ -28,15 +28,23 @@ jobs:
           cache: npm
 
       # Build WealthKit
-      - run: npm ci
-      - run: npm run build
+      - name: Install WealthKit deps
+        run: npm ci
 
-      # Build WizardGame into dist/game/
-      - run: npm ci
+      - name: Build WealthKit
+        run: npm run build
+
+      # Build WizardGame
+      - name: Install WizardGame deps
+        run: npm ci
         working-directory: game
-      - run: npm run build
+
+      - name: Build WizardGame
+        run: npm run build
         working-directory: game
-      - run: mv game/dist dist/game
+
+      - name: Move game build into dist/game
+        run: mkdir -p dist/game && cp -r game/dist/. dist/game/
 
       - uses: actions/configure-pages@v5
 
