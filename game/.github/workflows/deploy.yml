@@ -27,16 +27,9 @@ jobs:
           node-version: 20
           cache: npm
 
-      # Build WealthKit
       - run: npm ci
-      - run: npm run build
 
-      # Build WizardGame into dist/game/
-      - run: npm ci
-        working-directory: game
       - run: npm run build
-        working-directory: game
-      - run: mv game/dist dist/game
 
       - uses: actions/configure-pages@v5
 
