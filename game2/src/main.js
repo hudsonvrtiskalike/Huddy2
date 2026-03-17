@@ -492,6 +492,10 @@ function serveCustomer(c) {
   }
 }
 
+function updateCar() {
+  // Car movement is handled in updatePlayer when player.inCar is true
+}
+
 function updateCustomers() {
   // Respawn served customers
   customers=customers.filter(c=>c.state!=='served'||(c.timer--,c.timer>0)?true:false);
