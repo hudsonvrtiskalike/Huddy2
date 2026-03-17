@@ -27,30 +27,32 @@ jobs:
           node-version: 20
           cache: npm
 
-      # Build WealthKit
       - name: Install WealthKit deps
         run: npm ci
-
       - name: Build WealthKit
         run: npm run build
 
-      # Build WizardGame
       - name: Install WizardGame deps
         run: npm ci
         working-directory: game
-
       - name: Build WizardGame
         run: npm run build
         working-directory: game
-
-      - name: Move game build into dist/game
+      - name: Copy WizardGame into dist/game
         run: mkdir -p dist/game && cp -r game/dist/. dist/game/
 
-      - uses: actions/configure-pages@v5
+      - name: Install SkeletonGame deps
+        run: npm ci
+        working-directory: game2
+      - name: Build SkeletonGame
+        run: npm run build
+        working-directory: game2
+      - name: Copy SkeletonGame into dist/game2
+        run: mkdir -p dist/game2 && cp -r game2/dist/. dist/game2/
 
+      - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
-
       - uses: actions/deploy-pages@v4
         id: deployment
