@@ -4,25 +4,108 @@ This file provides guidance for AI assistants (Claude and others) working in thi
 
 ## Repository Overview
 
-This is a new, empty repository. This CLAUDE.md will be updated as the project evolves with actual codebase details, conventions, and workflows.
+**WealthKit** is a personal finance dashboard built with React and Vite. It provides three interactive tools:
 
-## Current State
+- **Calculator** — compound interest growth projector with sliders and a live chart
+- **Watchlist** — filterable list of stocks/crypto with add/remove support
+- **Budget** — monthly income/expense/investing tracker with a quick insight
 
-- **Status**: Newly initialized repository with no source code yet
-- **Branch**: Development occurs on `claude/add-claude-documentation-npfmC`
-- **Remote**: `hudsonvrtiskalike/Huddy2`
+## Tech Stack
+
+| Layer       | Technology                          |
+|-------------|-------------------------------------|
+| Framework   | React 18 (functional components + hooks) |
+| Bundler     | Vite 5                              |
+| Charts      | Recharts 2                          |
+| Styling     | Inline styles via a shared `G` theme object |
+| Language    | JavaScript (JSX, no TypeScript)     |
+| Font        | DM Sans (Google Fonts, loaded at runtime) |
+
+## Directory Structure
+
+```
+wealthkit/
+├── index.html          # Vite HTML entry point
+├── vite.config.js      # Vite config (React plugin)
+├── package.json
+├── .gitignore
+└── src/
+    ├── main.jsx        # React root — mounts <App /> into #root
+    └── App.jsx         # Entire application (single-file component)
+```
+
+> All application logic currently lives in `src/App.jsx`. As the app grows, split components into `src/components/`.
+
+## Project Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server (http://localhost:5173)
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build locally
+npm run preview
+```
+
+## Architecture
+
+### Theme
+
+All colors are defined in a single `G` object at the top of `src/App.jsx`:
+
+```js
+const G = {
+  bg: "#0a0a0f", surface: "#13131f", border: "#1e1e30",
+  text: "#e8e8f0", muted: "#555570",
+  green: "#00e5a0", blue: "#00b4d8", purple: "#a78bfa", red: "#ff6b6b",
+};
+```
+
+Always use `G.*` tokens rather than hardcoding hex values.
+
+### Shared Components
+
+- **`Card`** — surface container with rounded corners and border. Accepts a `style` spread for overrides.
+- **`Pill`** — small toggle button used for filter tabs. Props: `label`, `active`, `onClick`.
+
+### Feature Components
+
+| Component     | State                                         | Key logic |
+|---------------|-----------------------------------------------|-----------|
+| `Calculator`  | `start`, `monthly`, `rate`, `years`           | `calcGrowth()` computes year-by-year compound growth |
+| `Watchlist`   | `list` (array), `filter`, `adding`, form fields | Add/remove items; filter by `type` ("all" / "stock" / "crypto") |
+| `Budget`      | `cats` (array of categories)                  | Sums income, expenses, investing; derives `left` |
+
+### Data
+
+Seed data lives as module-level constants:
+- `SEED` — default watchlist items
+- `DEFAULT_CATS` — default budget categories
+
+All state is local to each component (no global store). Data resets on page refresh — there is no persistence layer yet.
+
+## Code Conventions
+
+- **Inline styles only** — no CSS files or CSS-in-JS libraries. Use the `G` theme object for all color references.
+- **Flat component tree** — helper components (`Row`, `Card`, `Pill`) are defined in the same file; keep them co-located unless reused across multiple files.
+- **No TypeScript** — plain `.jsx` files. Add prop validation with PropTypes only if a component's API becomes non-obvious.
+- **No global state** — use `useState` locally. Introduce a store (Zustand, Context) only when state genuinely needs to be shared across sibling trees.
+- **Formatting** — `fmt()` is the single currency formatter; reuse it for all `$` display values.
 
 ## Development Workflow
 
 ### Branch Strategy
 
 - Never push directly to `main` or `master`
-- Feature branches should follow the pattern: `claude/<feature-description>-<session-id>`
-- Always use `git push -u origin <branch-name>` when pushing a new branch
+- Feature branches: `claude/<feature-description>-<session-id>`
+- Always push with: `git push -u origin <branch-name>`
 
 ### Commit Conventions
-
-Use clear, descriptive commit messages:
 
 ```
 <type>: <short summary>
@@ -30,67 +113,31 @@ Use clear, descriptive commit messages:
 <optional body>
 ```
 
-Common types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
+Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
+
+Examples:
+- `feat: add localStorage persistence for watchlist`
+- `fix: correct compound interest calculation for monthly compounding`
+- `refactor: extract Calculator into src/components/Calculator.jsx`
 
 ### Making Changes
 
-1. Ensure you are on the correct feature branch before making changes
-2. Read existing files before editing them
-3. Run tests before committing (once a test suite is configured)
-4. Keep commits focused and atomic
+1. Confirm you are on the correct feature branch
+2. Read the file before editing it
+3. Keep commits focused — one logical change per commit
+4. Run `npm run build` before pushing to catch any build errors (no automated CI yet)
 
-## Code Conventions
+## Potential Next Steps
 
-These will be updated once the project stack is established. General guidelines:
-
-- Prefer editing existing files over creating new ones
-- Avoid over-engineering — minimum complexity for the current task
-- No unused imports, variables, or dead code
-- No backwards-compatibility hacks for code that no longer exists
-
-## Project Setup
-
-*To be filled in once the project is initialized with a tech stack.*
-
-Typical steps will include:
-
-```bash
-# Install dependencies
-npm install   # or: pnpm install / yarn / pip install -r requirements.txt
-
-# Run development server
-npm run dev
-
-# Run tests
-npm test
-
-# Build for production
-npm run build
-```
-
-## Environment Variables
-
-*Document required environment variables here as the project grows.*
-
-```
-# Example:
-# DATABASE_URL=...
-# API_KEY=...
-```
-
-## Architecture Notes
-
-*To be filled in as the codebase grows.*
-
-Key areas to document:
-- Directory structure and purpose of each folder
-- Data flow and key abstractions
-- External services and integrations
-- Testing strategy
+- **Persistence** — save watchlist and budget to `localStorage`
+- **Real prices** — integrate a market data API (e.g. Yahoo Finance, Polygon.io) for live watchlist quotes
+- **Split components** — move `Calculator`, `Watchlist`, and `Budget` into `src/components/`
+- **Testing** — add Vitest + React Testing Library
+- **TypeScript** — migrate to `.tsx` for better IDE support
 
 ## AI Assistant Notes
 
-- This file should be kept up to date as the project evolves
-- When adding a new major feature or dependency, update the relevant sections above
-- If conventions diverge from what is documented here, update this file
-- Prefer making small, focused changes; avoid large sweeping refactors unless explicitly requested
+- Keep all color values referenced through `G.*` — never hardcode hex values
+- Inline styles are intentional; do not introduce CSS files without discussion
+- The app is fully client-side with no backend — do not add server-side code without explicit instruction
+- Update this file when adding new dependencies, components, or architectural patterns
